@@ -252,7 +252,124 @@ void Machine::cycle() {
         pc += 2;
     break;
     case 0xD000:
-        //drawing case
+    //DXYN
+    //this snippit is taken straight from reference 1
+    {
+
+    unsigned short x = V[(opcode & 0x0F00) >> 8];
+    unsigned short y = V[(opcode & 0x00F0) >> 4];
+    unsigned short height = opcode & 0x000F;
+    unsigned short pixel;
+
+    V[0xF] = 0;
+    for (int yline = 0; yline < height; yline++)
+    {
+    pixel = memory[I + yline];
+    for(int xline = 0; xline < 8; xline++)
+    {
+      if((pixel & (0x80 >> xline)) != 0)
+      {
+        if(display[(x + xline + ((y + yline) * 64))] == 1)
+          V[0xF] = 1;
+        display[x + xline + ((y + yline) * 64)] ^= 1;
+      }
+    }
+    }
+
+    draw = true;
+    pc += 2;
+
+    }
     break;
+    case 0xE000:
+        switch(opcode & 0x000F) {
+        case 0x000E:
+            //EX9E
+            X = (opcode & 0x0F00) >> (2*4);
+            pc += 2;
+            if(key[V[X]]) pc += 2;
+        break;
+        case 0x0001:
+            //EXA1
+            X = (opcode & 0x0F00) >> (2*4);
+            pc += 2;
+            if(!key[V[X]]) pc += 2;
+        break;
+        }
+    break;
+    case 0xF000:
+        switch(opcode & 0x00FF) { //compare two values since there are a lot of F
+        case 0x0007:
+            //FX07
+            X = (opcode & 0x0F00) >> (2*4);
+            V[X] = delay_timer;
+            pc += 2;
+        break;
+        case 0x000A: { //handing key presses wrap in block for variable declarations
+            //FX0A
+            bool pressed = false;
+            X = (opcode & 0x0F00) >> (2*4);
+            for(int i=0; i<16; i++) {
+                if(key[i]) {
+                    V[X] = i;
+                    pressed = true;
+                }
+            }
+            if(!pressed) return; //await
+            pc += 2;
+        }
+        break;
+        case 0x0015:
+            //FX15
+            X = (opcode & 0x0F00) >> (2*4);
+            delay_timer = V[X];
+            pc += 2;
+        break;
+        case 0x0018:
+            //FX18
+            X = (opcode & 0x0F00) >> (2*4);
+            sound_timer = V[X];
+            pc += 2;
+        break;
+        case 0x001E:
+            //FX1E
+            X = (opcode & 0x0F00) >> (2*4);
+            if(I + V[X] > 0x0FFF) V[15] = 1;
+            else V[15] = 0;
+            I = I + V[X];
+            pc += 2;
+        break;
+        case 0x0029:
+            //FX29
+            X = (opcode & 0x0F00) >> (2*4);
+            I = V[X] * 0x5; //reference 1
+            pc += 2;
+        break;
+        case 0x0033:
+            //FX33
+            X = (opcode & 0x0F00) >> (2*4);
+            memory[I] = V[X] / 100;
+            memory[I + 1] = (V[X] / 10) % 10;
+            memory[I + 2] = (V[X] % 100) % 10;
+            pc += 2;
+        break;
+        case 0x0055:
+            X = (opcode & 0x0F00) >> (2*4);
+            for (int i=0; i<=X; i++) {
+                memory[I + i] = V[i];
+            }
+            I = I + X + 1;
+            pc += 2;
+        break;
+        case 0x0065:
+            //FX65
+            X = (opcode & 0x0F00) >> (2*4);
+            for(int i=0; i<=X; i++) {
+                V[i] = memory[I + i];
+            }
+            I = I + X + 1;
+            pc += 2;
+        break;
+        }
     }
 }
