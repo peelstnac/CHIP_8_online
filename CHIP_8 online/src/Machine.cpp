@@ -339,7 +339,7 @@ void Machine::cycle() {
       {
         if(display[(x + xline + ((y + yline) * 64))] == 1)
           V[0xF] = 1;
-        display[x + xline + ((y + yline) * 64)] ^= 1;
+       display[(x + xline + ((y + yline) * 64)) % (64 * 32)] ^= 1;
       }
     }
     }
