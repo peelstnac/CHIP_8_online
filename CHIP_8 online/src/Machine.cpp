@@ -3,6 +3,14 @@
 #include <cstring>
 #include <fstream>
 
+//references
+//1 - http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
+//2 - http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
+//3 - https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
+
+//other links that the comments refer to
+//https://stackoverflow.com/questions/2711522/what-happens-if-i-assign-a-negative-value-to-an-unsigned-variable
+
 Machine::Machine()
 {
     //ctor
@@ -188,11 +196,35 @@ void Machine::cycle() {
             //additional note: think of carry as negative result
             X = (opcode & 0x0F00) >> (2*4);
             Y = (opcode & 0x00F0) >> (1*4);
-            if(V[X] < V[Y]) V[15] = 1;
-            else V[15] = 0;
+            if(V[X] < V[Y]) V[15] = 0;
+            else V[15] = 1;
             //note that it is ok for this value to be negative
             //see "what happens if I assign a negative value to unsigned char"
             V[X] = V[X] - V[Y];
+            pc += 2;
+        break;
+        case 0x0006:
+            //8XY6
+            X = (opcode & 0x0F00) >> (2*4);
+            V[15] = V[X] & 0x0001;
+            V[X] = V[X] >> 1;
+            pc += 2;
+        break;
+        case 0x0007:
+            //8XY7
+            //THIS IS NOT THE SAME AS 8XY5
+            X = (opcode & 0x0F00) >> (2*4);
+            Y = (opcode & 0x00F0) >> (1*4);
+            if(V[X] > V[Y]) V[15] = 0;
+            else V[15] = 1;
+            V[X] = V[Y] - V[X];
+            pc += 2;
+        break;
+        case 0x000E: //check if this is correct
+            //8XYE
+            X = (opcode & 0x0F00) >> (2*4);
+            V[15] = V[X] >> 7; //most significant bit (important to note that it's a bit)
+            V[X] = V[X] << 1;
             pc += 2;
         break;
         }
