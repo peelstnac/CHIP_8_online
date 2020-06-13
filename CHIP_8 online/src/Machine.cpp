@@ -71,6 +71,11 @@ bool Machine::load(std::string path) {
 }
 
 void Machine::cycle() {
+    std::uint16_t reg;
+    std::uint16_t val;
+    std::uint16_t X;
+    std::uint16_t Y;
+
     opcode = memory[pc] << 8 | memory[pc+1]; //16 bits
     //consider starting letter
     switch(opcode & 0xF000) {
@@ -102,6 +107,26 @@ void Machine::cycle() {
         sp++; //increment stack
         pc = (opcode & 0x0FFF); //call function at 0NNN
     break;
-
+    case 0x3000: //verify if this is correct later
+        //3XNN
+        reg = (opcode & 0x0F00) >> 2*4; //shift 2 places in hex
+        val = (opcode & 0x00FF);
+        pc += 2;
+        if(V[reg] == val) pc += 2;
+    break;
+    case 0x4000:
+        //4XNN
+        reg = (opcode & 0x0F00) >> 2*4; //shift 2 places in hex
+        val = (opcode & 0x00FF);
+        pc += 2;
+        if(V[reg] != val) pc += 2;
+    break;
+    case 0x5000:
+        //5XY0
+        X = (opcode & 0x0F00) >> 2*4;
+        Y = (opcode & 0x00F0) >> 1*4;
+        pc += 2;
+        if(V[X] == V[Y]) pc += 2;
+    break;
     }
 }
