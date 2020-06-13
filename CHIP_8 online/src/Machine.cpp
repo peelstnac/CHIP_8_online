@@ -72,6 +72,7 @@ bool Machine::load(std::string path) {
 }
 
 void Machine::cycle() {
+    //holder variables
     std::uint16_t reg;
     std::uint16_t val;
     std::uint16_t X;
@@ -110,30 +111,40 @@ void Machine::cycle() {
     break;
     case 0x3000: //verify if this is correct later
         //3XNN
-        reg = (opcode & 0x0F00) >> 2*4; //shift 2 places in hex
+        reg = (opcode & 0x0F00) >> (2*4); //shift 2 places in hex
         val = (opcode & 0x00FF);
         pc += 2;
         if(V[reg] == val) pc += 2;
     break;
     case 0x4000:
         //4XNN
-        reg = (opcode & 0x0F00) >> 2*4; //shift 2 places in hex
+        reg = (opcode & 0x0F00) >> (2*4); //shift 2 places in hex
         val = (opcode & 0x00FF);
         pc += 2;
         if(V[reg] != val) pc += 2;
     break;
     case 0x5000:
         //5XY0
-        X = (opcode & 0x0F00) >> 2*4;
-        Y = (opcode & 0x00F0) >> 1*4;
+        X = (opcode & 0x0F00) >> (2*4);
+        Y = (opcode & 0x00F0) >> (1*4);
         pc += 2;
         if(V[X] == V[Y]) pc += 2;
     break;
     case 0x6000:
         //6XNN
-        X = (opcode & 0x0F00) >> 2*4;
+        X = (opcode & 0x0F00) >> (2*4);
         V[X] = (opcode & 0x00FF);
         pc += 2;
     break;
+    case 0x7000:
+        //7XNN
+        X = (opcode & 0x0F00) >> (2*4);
+        V[X] += (opcode & 0x00FF);
+        pc += 2;
+    break;
+    case 0x8000:
+        switch(opcode & 0x000F) {
+
+        }
     }
 }
