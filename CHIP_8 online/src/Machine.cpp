@@ -14,7 +14,7 @@
 
 Machine::Machine()
 {
-    //ctor
+    std::cout << "Created instance of Machine\n";
 }
 
 Machine::~Machine()
@@ -81,6 +81,10 @@ bool Machine::load(std::string path) {
 }
 
 void Machine::cycle() {
+    if(delay_timer) delay_timer--;
+    if(sound_timer) sound_timer--;
+    //NOTE IMPLEMENT SOUND TRIGGER ONCE WEBSOCKETS ARE SET UP
+
     //holder variables
     std::uint16_t reg;
     std::uint16_t val;
@@ -342,7 +346,7 @@ void Machine::cycle() {
         case 0x0029:
             //FX29
             X = (opcode & 0x0F00) >> (2*4);
-            I = V[X] * 0x5; //reference 1
+            I = V[X] * 5; //reference 1
             pc += 2;
         break;
         case 0x0033:
