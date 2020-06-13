@@ -42,6 +42,7 @@ bool Machine::init() {
     draw = true;
     I = 0;
     memset(display, 0, sizeof(display));
+    return true;
 }
 
 bool Machine::load(std::string path) {
@@ -127,6 +128,12 @@ void Machine::cycle() {
         Y = (opcode & 0x00F0) >> 1*4;
         pc += 2;
         if(V[X] == V[Y]) pc += 2;
+    break;
+    case 0x6000:
+        //6XNN
+        X = (opcode & 0x0F00) >> 2*4;
+        V[X] = (opcode & 0x00FF);
+        pc += 2;
     break;
     }
 }
