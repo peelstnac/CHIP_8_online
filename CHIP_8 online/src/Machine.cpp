@@ -89,5 +89,19 @@ void Machine::cycle() {
         break;
         }
     break;
+    case 0x1000:
+        //1NNN
+        //additional note: NNN just means a placeholder value
+        pc = (opcode & 0x0FFF);
+        //no need to increment pc here since goto is called
+    break;
+    case 0x2000:
+        //2NNN
+        //additional note: think of what C++ callstack does when calling function
+        _stack[sp] = pc; //push current pointer to stack
+        sp++; //increment stack
+        pc = (opcode & 0x0FFF); //call function at 0NNN
+    break;
+
     }
 }
