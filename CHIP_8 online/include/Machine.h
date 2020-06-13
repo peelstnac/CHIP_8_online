@@ -20,7 +20,7 @@ class Machine
         std::uint16_t pc;
         std::uint16_t I;
         std::uint8_t key[16];
-        std::uint8_t display[2048];
+        std::uint8_t display[2048]; //64 x 32
 };
 
 #endif // MACHINE_H
