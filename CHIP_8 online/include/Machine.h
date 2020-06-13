@@ -8,7 +8,11 @@ class Machine
         Machine();
         virtual ~Machine();
 
+        bool init();
         bool load(std::string path);
+        void cycle();
+
+        bool draw;
     private:
         std::uint8_t memory[4096];
         std::uint8_t V[16]; //registers
