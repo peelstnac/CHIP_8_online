@@ -1,6 +1,7 @@
 #include "Machine.h"
 #include <iostream>
 #include <cstring>
+#include <cstdlib>
 #include <fstream>
 
 //references
@@ -228,5 +229,30 @@ void Machine::cycle() {
             pc += 2;
         break;
         }
+    case 0x9000:
+        //9XY0
+        X = (opcode & 0x0F00) >> (2*4);
+        Y = (opcode & 0x00F0) >> (1*4);
+        pc += 2;
+        if(V[X] != V[Y]) pc += 2;
+    break;
+    case 0xA000:
+        //ANNN
+        I = opcode & 0x0FFF;
+        pc += 2;
+    break;
+    case 0xB000:
+        //BNNN
+        pc = V[0] + (opcode & 0x0FFF);
+    break;
+    case 0xC000:
+        //CXNN
+        X = (opcode & 0x0F00) >> (2*4);
+        V[X] = (std::rand() % 255) & (opcode & 0x00FF);
+        pc += 2;
+    break;
+    case 0xD000:
+        //drawing case
+    break;
     }
 }
