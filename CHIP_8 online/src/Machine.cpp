@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
+#include <stdio.h>
 #include <fstream>
 
 //references
@@ -12,8 +13,14 @@
 //other links that the comments refer to
 //https://stackoverflow.com/questions/2711522/what-happens-if-i-assign-a-negative-value-to-an-unsigned-variable
 
+/*
+TODO:
+-fix graphics op code overload
+*/
+
 Machine::Machine()
 {
+    //note that contents of init is not here because of future switch between game feature
     std::cout << "Created instance of Machine\n";
 }
 
@@ -51,13 +58,15 @@ bool Machine::init() {
     draw = true;
     I = 0;
     memset(display, 0, sizeof(display));
+    std::cout << "init() SUCCESSFUL" << std::endl;
     return true;
 }
 
+//this function is buggy use the one taken from reference 1 until fixed
 bool Machine::load(std::string path) {
+    init();
     std::ifstream in;
     in.open(path);
-    char* buffer;
     in.seekg(0, in.end);
     int length = in.tellg();
     /*
@@ -67,17 +76,70 @@ bool Machine::load(std::string path) {
     0x200-0xFFF - Program ROM and work RAM
     */
     if(length > 3584) {
-        std::cout << "FILE TOO BIG, ABORTING.\n";
+        std::cout << "FILE TOO BIG, ABORTING" << std::endl;
         return false;
     }
+    char* buffer = (char*)malloc(length * sizeof(char));
     in.seekg(0, in.beg);
     in.read(buffer, length);
     in.close();
     for(int i=0; i<length; i++) {
         memory[i + 512] = buffer[i];
     }
-    init();
+    std::cout << "load() SUCCESSFUL" << std::endl;
     return true;
+}
+
+//use this until top is fixed
+bool Machine::loadApplication(const char * filename)
+{
+	init();
+	printf("Loading: %s\n", filename);
+
+	// Open file
+	FILE * pFile = fopen(filename, "rb");
+	if (pFile == NULL)
+	{
+		fputs ("File error", stderr);
+		return false;
+	}
+
+	// Check file size
+	fseek(pFile , 0 , SEEK_END);
+	long lSize = ftell(pFile);
+	rewind(pFile);
+	printf("Filesize: %d\n", (int)lSize);
+
+	// Allocate memory to contain the whole file
+	char * buffer = (char*)malloc(sizeof(char) * lSize);
+	if (buffer == NULL)
+	{
+		fputs ("Memory error", stderr);
+		return false;
+	}
+
+	// Copy the file into the buffer
+	size_t result = fread (buffer, 1, lSize, pFile);
+	if (result != lSize)
+	{
+		fputs("Reading error",stderr);
+		return false;
+	}
+
+	// Copy buffer to Chip8 memory
+	if((4096-512) > lSize)
+	{
+		for(int i = 0; i < lSize; ++i)
+			memory[i + 512] = buffer[i];
+	}
+	else
+		printf("Error: ROM too big for memory");
+
+	// Close file, free buffer
+	fclose(pFile);
+	free(buffer);
+
+	return true;
 }
 
 void Machine::cycle() {
@@ -92,6 +154,7 @@ void Machine::cycle() {
     std::uint16_t Y;
 
     opcode = memory[pc] << 8 | memory[pc+1]; //16 bits
+    //std::cout << opcode << std::endl;
     //consider starting letter
     switch(opcode & 0xF000) {
     case 0x0000:
@@ -121,6 +184,7 @@ void Machine::cycle() {
         _stack[sp] = pc; //push current pointer to stack
         sp++; //increment stack
         pc = (opcode & 0x0FFF); //call function at 0NNN
+        //std::cout << "BRUH " << pc << std::endl;
     break;
     case 0x3000: //verify if this is correct later
         //3XNN

@@ -1,4 +1,16 @@
 # depslib dependency file v1.0
-1584205420 source:c:\users\freem\desktop\chip-8 online\chip_8_online\chip_8 online\main.cpp
+1592080566 source:c:\users\freem\desktop\chip-8 online\chip_8_online\chip_8 online\main.cpp
 	<iostream>
+	"Machine.h"
+
+1592081769 source:c:\users\freem\desktop\chip-8 online\chip_8_online\chip_8 online\src\machine.cpp
+	"Machine.h"
+	<iostream>
+	<cstring>
+	<cstdlib>
+	<stdio.h>
+	<fstream>
+
+1592079078 c:\users\freem\desktop\chip-8 online\chip_8_online\chip_8 online\include\machine.h
+	<string>
 
