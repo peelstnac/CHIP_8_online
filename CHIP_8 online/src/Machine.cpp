@@ -71,5 +71,23 @@ bool Machine::load(std::string path) {
 }
 
 void Machine::cycle() {
-
+    opcode = memory[pc] << 8 | memory[pc+1]; //16 bits
+    //consider starting letter
+    switch(opcode & 0xF000) {
+    case 0x0000:
+        switch(opcode & 0x000F) {
+        case 0x0000:
+            //00E0
+            memset(display, 0, sizeof(display));
+        break;
+        case 0x000E:
+            //00EE
+            //additional note: just think of C++ callstack when function returns
+            sp--;
+            pc = _stack[sp];
+            pc += 2; //thank you reference 1
+        break;
+        }
+    break;
+    }
 }
