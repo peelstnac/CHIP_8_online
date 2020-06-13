@@ -144,6 +144,35 @@ void Machine::cycle() {
     break;
     case 0x8000:
         switch(opcode & 0x000F) {
+        case 0x0000:
+            //8XY0
+            X = (opcode & 0x0F00) >> (2*4);
+            Y = (opcode & 0x00F0) >> (1*4);
+            V[X] = V[Y];
+            pc += 2;
+        break;
+        case 0x0001:
+            //8XY1
+            X = (opcode & 0x0F00) >> (2*4);
+            Y = (opcode & 0x00F0) >> (1*4);
+            V[X] = V[X] | V[Y];
+            pc += 2;
+        break;
+        case 0x0002:
+            //8XY2
+            X = (opcode & 0x0F00) >> (2*4);
+            Y = (opcode & 0x00F0) >> (1*4);
+            V[X] = V[X] & V[Y];
+            pc += 2;
+        break;
+        case 0x0003:
+            //8XY3
+            X = (opcode & 0x0F00) >> (2*4);
+            Y = (opcode & 0x00F0) >> (1*4);
+            V[X] = V[X] ^ V[Y];
+            pc += 2;
+        break;
+
 
         }
     }
