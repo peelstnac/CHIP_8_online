@@ -172,8 +172,29 @@ void Machine::cycle() {
             V[X] = V[X] ^ V[Y];
             pc += 2;
         break;
-
-
+        case 0x0004:
+            //8XY4
+            //additional note: just think of carry as exceeding 0x00FF
+            //set 16th register if carry
+            X = (opcode & 0x0F00) >> (2*4);
+            Y = (opcode & 0x00F0) >> (1*4);
+            if(V[X] + V[Y] > 0x00FF) V[15] = 1;
+            else V[15] = 0;
+            V[X] = V[X] + V[Y];
+            pc += 2;
+        break;
+        case 0x0005:
+            //8XY5
+            //additional note: think of carry as negative result
+            X = (opcode & 0x0F00) >> (2*4);
+            Y = (opcode & 0x00F0) >> (1*4);
+            if(V[X] < V[Y]) V[15] = 1;
+            else V[15] = 0;
+            //note that it is ok for this value to be negative
+            //see "what happens if I assign a negative value to unsigned char"
+            V[X] = V[X] - V[Y];
+            pc += 2;
+        break;
         }
     }
 }
